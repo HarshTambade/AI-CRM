@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./ai_crm.db
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DEBUG=false
+      - MODEL_DEVICE=cpu
+    volumes:
+      - ./backend:/app
+      - ai_models:/app/models
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    restart: unless-stopped
+
+volumes:
+  ai_models: 
